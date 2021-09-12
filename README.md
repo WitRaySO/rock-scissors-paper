@@ -21,20 +21,16 @@ path : `/user/:ชื่อศัตรู/invitation`
 
 JSON body : `{ "username" : "","choice" : ""}`
 
+## ท้าผู้เล่นอีกคนในระบบที่มีชื่ออยู่ใน Database 
+RESTful verb : `GET`
 
+path : `/user/:ชื่อศัตรู/comparison`
 
-##
-GET Method
-/getAllUsers
+JSON body : `{"username" : ""}`
 
-##
-GET Method
-/ladderboard
+## ท้าผู้เล่นอีกคนในระบบที่มีชื่ออยู่ใน Database 
+RESTful verb : `GET`
 
-##
-GET Method
-/user/ชื่อศัตรู/comparation
-ส่ง JSON Body
-{
-"username" : "",
-}
+path : `/leadderboard`
+
+JSON body : `-`
