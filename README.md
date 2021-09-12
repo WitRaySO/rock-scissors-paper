@@ -17,16 +17,16 @@ JSON body : `-`
 ## ท้าผู้เล่นอีกคนในระบบที่มีชื่ออยู่ใน Database 
 RESTful verb : `POST`
 
-path : `/user/:ชื่อศัตรู/invitation`
+path : `/user/:ชื่อเรา/invitation`
 
-JSON body : `{ "username" : "","choice" : ""}`
+JSON body : `{ "username" : "ชื่อศัตรู","choice" : ""}`
 
-## ท้าผู้เล่นอีกคนในระบบที่มีชื่ออยู่ใน Database 
+## เปรียบเทียบเรากับ User คนอิ่น
 RESTful verb : `GET`
 
-path : `/user/:ชื่อศัตรู/comparison`
+path : `/user/:ชื่อเรา/comparison`
 
-JSON body : `{"username" : ""}`
+JSON body : `{"username" : "ชื่อศัตรู"}`
 
 ## ท้าผู้เล่นอีกคนในระบบที่มีชื่ออยู่ใน Database 
 RESTful verb : `GET`
