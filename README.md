@@ -34,3 +34,11 @@ RESTful verb : `GET`
 path : `/leaderboard`
 
 JSON body : `-`
+
+## Tech ที่ใช้
+Programming language : `golang`
+
+Framwork : `Gin`
+
+Database : `MongoDB Atlas (Cloud)`
+
