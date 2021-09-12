@@ -1,7 +1,6 @@
 # rock-scissors-paper
 
 ## ใส่ชี่อ User สู่ Database
-
 RESTful verb : `PUT Method`
 
 path : `/signup`
