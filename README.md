@@ -28,9 +28,9 @@ path : `/user/:ชื่อเรา/comparison`
 
 JSON body : `{"username" : "ชื่อศัตรู"}`
 
-## ท้าผู้เล่นอีกคนในระบบที่มีชื่ออยู่ใน Database 
+## Leaderboard
 RESTful verb : `GET`
 
-path : `/leadderboard`
+path : `/leaderboard`
 
 JSON body : `-`
