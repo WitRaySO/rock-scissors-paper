@@ -1,12 +1,9 @@
 # rock-scissors-paper
 
-## ใส่ช่ือ
-PUT Method
-/signup
-ส่ง JSON Body
-{
-"username" : ""
-}
+## ใส่ชี่อ User สู่ Database
+Method : `PUT Method`
+path : `/signup`
+JSON Body : `{"username" : ""}`
 
 
 ## 
