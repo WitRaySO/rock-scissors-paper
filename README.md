@@ -1,12 +1,15 @@
 # rock-scissors-paper
 
 POST Method
+
 /user/ชื่อศัตรู/invitation
+
 ส่ง JSON Body
-{
+
+`{
 "username" : "",
 "choice" : ""
-}
+}`
 
 PUT Method
 /signup
