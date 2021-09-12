@@ -1,8 +1,10 @@
 # rock-scissors-paper
 
-## ใส่ชี่อ User สู่ Database
+#### ใส่ชี่อ User สู่ Database
 Method : `PUT Method`
+
 path : `/signup`
+
 JSON Body : `{"username" : ""}`
 
 
