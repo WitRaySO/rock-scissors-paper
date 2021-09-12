@@ -26,7 +26,7 @@ func main() {
 	router.PUT("/signup", signUp)
 	router.POST("/user/:username/invitation", rockScissorPaper)
 	router.GET("/user/:username/comparison", comparing)
-	router.GET("/ladderboard", leadderboard)	
+	router.GET("/leaderboard", leaderboard)	
 	router.Run("localhost:8080")
 }
 // func comparing(c *gin.Context) {
