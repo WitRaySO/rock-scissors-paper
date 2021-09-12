@@ -24,7 +24,7 @@ type formatUserRanking struct {
 	Tie int	`json:"tie" bson:"tie"`
 }
 
-func ladderboard(c *gin.Context) {
+func leadderboard(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
