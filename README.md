@@ -5,7 +5,7 @@ RESTful verb : `PUT Method`
 
 path : `/signup`
 
-JSON Body : `{"username" : ""}`
+JSON body : `{"username" : ""}`
 
 
 ## 
