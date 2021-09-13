@@ -19,7 +19,7 @@ RESTful verb : `POST`
 
 path : `/user/:ชื่อเรา/invitation`
 
-JSON body : `{ "username" : "ชื่อศัตรู","choice" : ""}`
+JSON body : `{ "username" : "ชื่อศัตรู","choice" : ["rock","scissors","paper"]}`
 
 ## เปรียบเทียบเรากับ User คนอิ่น
 RESTful verb : `GET`
