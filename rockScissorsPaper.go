@@ -46,19 +46,37 @@ func rockScissorPaper(c *gin.Context) {
 	if err := c.ShouldBindJSON(&json); err != nil {
 		log.Fatal(err)
 	}
-
+	
 	// name from param
 	currentUsername := c.Param("username")
 	currentUsernameChoice := json.Choice
 	opponentUsername := json.Username
 	db := client.Database("rock_scissors_paper")
+	usersColl := db.Collection("users")
 	invitationColl := db.Collection("invitation")
-	opts := options.FindOne().SetSort(bson.D{{Key: "date",Value: -1}})
+
+	// check if someone challenge himself or not
+	if currentUsername == opponentUsername {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "You can't challenge yourself"})	
+		return	
+	}	
+	// check if opponentUser exist or not
+	filter := bson.D{{Key: "username",Value: opponentUsername}}
+	var u user
+	err = usersColl.FindOne(ctx,filter).Decode(&u)
+	if err != nil {
+		if err != mongo.ErrNoDocuments {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"message": "There is not that username in system"})	
+		return
+	}
 
 	var currentUserInvitation invitation
 	var opponentUserInvitation invitation
 	var zeroValueResult invitation
 	// fetch data for currentUser invitation
+	opts := options.FindOne().SetSort(bson.D{{Key: "date",Value: -1}})
 	err = invitationColl.FindOne(ctx, bson.D{{Key: "challenger",Value: currentUsername},{Key: "challenged",Value: opponentUsername},{Key: "matchStatus",Value: matchStart}},opts).Decode(&currentUserInvitation)
 	if err != nil {
 		if err != mongo.ErrNoDocuments {
@@ -96,7 +114,7 @@ func rockScissorPaper(c *gin.Context) {
 	}
 	// Opponent already create invitation , no need to create it again just find a result
 	// first change matchStatus to matchEnd in opponentUserInvitation
-	filter := bson.D{{Key: "_id", Value: opponentUserInvitation.ID}}
+	filter = bson.D{{Key: "_id", Value: opponentUserInvitation.ID}}
 	update := bson.D{{Key: "$set",Value : bson.D{{Key: "matchStatus",Value: matchEnd}}}}
 	updateResult, err := invitationColl.UpdateOne(ctx, filter, update)
 	if err != nil {
@@ -113,11 +131,11 @@ func rockScissorPaper(c *gin.Context) {
 		ChallengedChoice: challengedChoice,
 		Date: primitive.NewDateTimeFromTime(time.Now()),
 	}
-	
 	matchesColl := db.Collection("matches")
-	usersColl := db.Collection("users")
+
+	// check if them tie
 	if challengerChoice == challengedChoice {
-		// insert tie matched
+		// insert a tie matched
 		newMatch.Result = tie
 		insertResult, err := matchesColl.InsertOne(ctx, newMatch)
 		if err != nil {
@@ -136,19 +154,19 @@ func rockScissorPaper(c *gin.Context) {
 		// 	fmt.Println("matched and replaced an existing document")
 		// }
 		c.JSON(http.StatusOK, updateResult)
-		return	
+		return
+
+	// check if challenger win a match
 	} else if ((challengerChoice == "rock") && (challengedChoice == "scissors")) ||
 	 		((challengerChoice == "scissors") && (challengedChoice == "paper")) ||
 			((challengerChoice == "paper") && (challengedChoice == "rock")) {
-		// insert challengerWin matched
+		// insert a challengerWin match
 		newMatch.Result = challengerWin
 		insertResult, err := matchesColl.InsertOne(ctx, newMatch)
 		if err != nil {
 			log.Fatal(err)
 		}
 		c.JSON(http.StatusCreated, insertResult)
-		
-		// Update score in users collection for ChallengerWin
 		// Update win score to Challenger/Opponent
 		filter := bson.D{{Key: "username", Value: opponentUsername}}
 		update := bson.D{{Key: "$inc",Value : bson.D{{Key: "win",Value: 1}}}}
@@ -167,14 +185,15 @@ func rockScissorPaper(c *gin.Context) {
 		c.JSON(http.StatusOK, updateResult)
 		return		
 	}
-	// insert challengerLose matched
+
+	// if challenger lose a match do this
+	// insert a challengerLose match
 	newMatch.Result = challengerLose
 	insertResult, err := matchesColl.InsertOne(ctx, newMatch)
 	if err != nil {
 		log.Fatal(err)
 	}
 	c.JSON(http.StatusCreated, insertResult)
-	// Update score in users collection for ChallengerLose
 	// Update lose score to Challenger/Opponent
 	filter = bson.D{{Key: "username", Value: opponentUsername}}
 	update = bson.D{{Key: "$inc",Value : bson.D{{Key: "lose",Value: 1}}}}
@@ -183,7 +202,7 @@ func rockScissorPaper(c *gin.Context) {
 		log.Fatal(err)
 	}
 	c.JSON(http.StatusOK, updateResult)
-	// Update win score to Challenged/current	
+	// Update win score to Challenged/CurrentUser
 	filter = bson.D{{Key: "username", Value: currentUsername}}
 	update = bson.D{{Key: "$inc",Value : bson.D{{Key: "win",Value: 1}}}}
 	updateResult, err = usersColl.UpdateOne(ctx, filter, update)

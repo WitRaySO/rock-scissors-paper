@@ -80,7 +80,7 @@ func signUp(c *gin.Context) {
 	insertResult, err := coll.InsertOne(ctx, signupUser)
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
-			c.JSON(400, gin.H{"message": "DuplicateKeyError"})
+			c.JSON(http.StatusBadRequest, gin.H{"message": "DuplicateKeyError"})
 			return
 		}
 		log.Fatal(err)

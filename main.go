@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// matchResult
 const (
 	_ = iota
 	tie
@@ -21,7 +22,6 @@ const uri string = "mongodb+srv://witty:1234@project0.vzh5p.mongodb.net/user?ret
 
 func main() {
 	router := gin.Default()
-	// router.GET("/allUser", getUsers)
 	router.GET("/getAllUsers", getAllUsers)
 	router.PUT("/signup", signUp)
 	router.POST("/user/:username/invitation", rockScissorPaper)
@@ -29,11 +29,4 @@ func main() {
 	router.GET("/leaderboard", leaderboard)	
 	router.Run("localhost:8080")
 }
-// func comparing(c *gin.Context) {
-
-// }
-
-// func getLadderboard(c *gin.Context) {
-
-// }
 

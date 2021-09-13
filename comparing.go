@@ -57,11 +57,31 @@ func comparing(c *gin.Context) {
 	currentUsername := c.Param("username")
 	opponentUsername := opponentUser.Username	
 	db := client.Database("rock_scissors_paper")
+
+	// check if someone compare him to himself or not
+	if currentUsername == opponentUsername {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "You can't comparing yourself with yourself, compare to the others"})	
+		return	
+	}	
+	
+	// check if opponentUser exist or not
+	usersColl := db.Collection("users")
+	filter := bson.D{{Key: "username",Value: opponentUsername}}
+	var u user
+	err = usersColl.FindOne(ctx,filter).Decode(&u)
+	if err != nil {
+		if err != mongo.ErrNoDocuments {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusBadRequest, gin.H{"message": "There is not that username in system"})	
+		return
+	}
+
 	// fetch data from matches collection
 	matchesColl := db.Collection("matches")
-	// recent matched
+	// fetch recent matches
 	findOpts := options.Find().SetSort(bson.D{{"date", -1}}).SetLimit(8)
-	filter := bson.D{{"$or", []interface{} { bson.D{ {"$and" ,[]interface{} { bson.D{ {"challengerUser",currentUsername}}, bson.D{{"challengedUser",opponentUsername}}}}}, bson.D{{"$and" ,[]interface{} { bson.D{ {"challengerUser",opponentUsername}}, bson.D{ {"challengedUser",currentUsername}}}}}}}}
+	filter = bson.D{{"$or", []interface{} { bson.D{ {"$and" ,[]interface{} { bson.D{ {"challengerUser",currentUsername}}, bson.D{{"challengedUser",opponentUsername}}}}}, bson.D{{"$and" ,[]interface{} { bson.D{ {"challengerUser",opponentUsername}}, bson.D{ {"challengedUser",currentUsername}}}}}}}}
 	cursor, err :=  matchesColl.Find(ctx, filter,findOpts)
 	if err != nil {
 		log.Fatal(err)
@@ -70,8 +90,9 @@ func comparing(c *gin.Context) {
 	if err = cursor.All(ctx,&recentMatches); err != nil {
 		log.Fatal(err)
 	}
+	// fmt.Printf("recentMatches")
 	// win/lose history
-	// only win match
+	// fetch only win matches
 	filter = bson.D{ { "$or", []interface{} { bson.D{ {"$and" ,[]interface{} { bson.D{ {"challengerUser",currentUsername} }, bson.D{ {"challengedUser",opponentUsername} }, bson.D{ {"result",challengerWin} } }} }, bson.D{ {"$and" ,[]interface{} { bson.D{ {"challengerUser",opponentUsername} }, bson.D{ {"challengedUser",currentUsername} }, bson.D{ {"result",challengerLose} } }} } } } } 
 	cursor, err = matchesColl.Find(ctx, filter)
 	if err != nil {
@@ -81,7 +102,8 @@ func comparing(c *gin.Context) {
 	if err = cursor.All(ctx,&onlyWinMatches); err != nil {
 		log.Fatal(err)
 	}
-	// only lose match 
+	// fmt.Printf("win history")
+	// fetch only lose matches
 	filter = bson.D{ { "$or", []interface{} { bson.D{ {"$and" ,[]interface{} { bson.D{ {"challengerUser",currentUsername} }, bson.D{ {"challengedUser",opponentUsername} }, bson.D{ {"result",challengerLose} } }} }, bson.D{ {"$and" ,[]interface{} { bson.D{ {"challengerUser",opponentUsername} }, bson.D{ {"challengedUser",currentUsername} }, bson.D{ {"result",challengerWin} } }} } } } } 
 	cursor, err = matchesColl.Find(ctx, filter)
 	if err != nil {
@@ -91,6 +113,7 @@ func comparing(c *gin.Context) {
 	if err = cursor.All(ctx,&onlyLoseMatches); err != nil {
 		log.Fatal(err)
 	}
+	// fmt.Printf("lose history")
 	// status [challenger,challenged,neutral]
 	// fetch data from invitation collection
 	invitationColl := db.Collection("invitation")
@@ -111,7 +134,8 @@ func comparing(c *gin.Context) {
 	} else if i.Challenged == currentUsername {
 		userStatus = "challenged"
 	}
-
+		
+	// fmt.Printf("lose history")
 	var currentUserStat stat
 	currentUserStat.CurrentUser = currentUsername  
 	currentUserStat.OpponentUser = opponentUsername
